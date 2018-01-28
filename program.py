@@ -12,24 +12,35 @@ Run $ py program.py 2 5 training_set.csv validation_set.csv test_set.csv yes
 @author: Boty22
 """
 import sys
+from math import *
 
 def copyData(filename):
-	"""Reads the data and retund a list with the data in the cvs"""
-	data=[]
-	filename = "probando.csv"
-	try:
-		fh = open(filename,'r')
-	except IOError:
-		print('cannot open', filename)
-	else:
-		for new in fh:
-			if new !='\n':
-				addIt =  new[:-1].split(',')
-				data.append(addIt)
-	finally:
-		fh.close()
-		print(data)
-	return data
+    """Reads the data and retund a list with the data in the cvs"""
+    data=[]
+    filename = "probando.csv"
+    try:
+        fh = open(filename,'r')
+    except IOError:
+        print('cannot open', filename)
+    else:
+        for new in fh:
+            if new !='\n':
+                addIt =  new[:-1].split(',')
+                data.append(addIt)
+    finally:
+        fh.close()
+        print(data)
+    return data
+
+def entropy(p,n):
+    """Computes entropy
+    p and n are the number of positive and negative examples in the resulting class"""
+    if p == 0 or n == 0:
+        return 0;
+    else:
+        pr = p/(p+n)
+        nr = n/(p+n)
+        return -pr*log2(pr) - nr*log2(nr)
 
 print(sys.argv)
 print("This is the name of the script: ", sys.argv[0])
@@ -40,10 +51,11 @@ K = int(sys.argv[2])
 training_csv = sys.argv[3]
 validation_csv = sys.argv[4]
 test_csv = sys.argv[5]
-printOrder = sys.argv[6]
+print_order = sys.argv[6]
 
 a = copyData("probando.csv")
 
-print(L,K,training_csv,validation_csv,test_csv,test_csv,printOrder)
+print(L,K,training_csv,validation_csv,test_csv,test_csv,print_order)
 
 print(a)
+print(entropy(9,5))
