@@ -43,11 +43,14 @@ def entropy(n,p):
     else:
         pr = p/(p+n)
         nr = n/(p+n)
-        return -pr*log2(pr) - nr*log2(nr)
+        result = -pr*log2(pr) - nr*log2(nr)
+        print(result)
+        return result
 
 def gain(cn,cp,a0n,a0p,a1n,a1p):
-    total = cn + cn
+    total = cn + cp
     result = entropy(cn,cp)-(a0n+a0p)/total*entropy(a0n,a0p)-(a1n+a1p)/total*entropy(a1n,a1p)
+    #print(result)
     return result
 
 #tHE FOLLOWING PART IS TO READ FROM COMMAND LINE
@@ -87,7 +90,7 @@ for i in range(num_columns-1):
     att_1p = 0 #Attribute with value "1" results positive
     class_n = 0
     class_p = 0
-    best_gain = -0.0
+    best_gain = -10.000000
     selected_att = -1000
     for j in range(num_rows):
         if training_data[j,i] == 0:
