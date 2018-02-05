@@ -17,6 +17,9 @@ Run $ python program.py 2 5 training_set.csv validation_set.csv test_set.csv yes
 from math import log2
 import numpy as np
 
+class DescisionTree(object):
+    
+
 def copyData(filename):
     """Reads the data and retund a list with the data in the cvs"""
     data=[]
@@ -116,3 +119,4 @@ for i in range(num_columns-1):
         best_gain = g
         selected_att= i
 print(best_gain,i)
+
