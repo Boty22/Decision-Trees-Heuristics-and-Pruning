@@ -59,7 +59,7 @@ def class_counts(rows):
             counts['negatives'] += 1
     return counts
 
-print(class_counts(training_data))
+#print(class_counts(training_data))
     
 def partition(rows, attribute):
     """Partitions a dataset.
@@ -74,23 +74,40 @@ def partition(rows, attribute):
             false_rows.append(row)
     return true_rows,false_rows
 
-print(partition(training_data,1))
-
+#print(partition(training_data,1))
+strong, weak = partition(training_data,1)
+#print("Strong")
+#print(strong)
+#print("Weak")
+#print(weak)
 def entropy(rows):
     """Computes the entropy of a list of rows
     """
     counts = class_counts(rows)
     p = float(counts['positives'])
     n = float(counts['negatives'])
-    print(p,n)
+    #print(p,n)
     if p == 0 or n == 0:
         return 0;
     else:
         pr = p/(p+n)
         nr = 1 - pr
-        print(pr,nr)
+        #print(pr,nr)
         result = -pr*log2(pr) - nr*log2(nr)
-        print(result)
+        #print(result)
         return result
 
-print(entropy(training_data))
+#print(entropy(training_data))
+
+def gain(left,right,current_entropy):
+    """Information Gain.
+    The entropy of the starting node, 
+    minus the weight entropy of two child nodes
+    """
+    p = float(len(left))/(len(left)+len(right))
+    return current_entropy - p *entropy(left) - (1-p) * entropy(right)
+
+print(gain(strong, weak,entropy(training_data)))
+
+high,normal = partition(training_data,0)
+print(gain(high, normal,entropy(training_data)))
