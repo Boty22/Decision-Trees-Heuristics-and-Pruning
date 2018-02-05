@@ -12,7 +12,7 @@ import numpy as np
 def copyData(filename):
     """Reads the data and retund a list with the data in the cvs"""
     data=[]
-    filename = "probando.csv"
+    filename = "training_set.csv"
     try:
         fh = open(filename,'r')
     except IOError:
@@ -24,7 +24,7 @@ def copyData(filename):
                 data.append(addIt)
     finally:
         fh.close()
-        print(data)
+        #print(data)
     return data
 
 #Copying the file to a list 
@@ -46,7 +46,7 @@ def convert_list_s_int(l_s):
 #print(a[1:])
         
 training_data= convert_list_s_int(a[1:])
-print(training_data)
+#print(training_data)
 
 def class_counts(rows):
     """ Counts how many positives and negatives a class has
@@ -159,3 +159,16 @@ def build_tree(rows):
     
     return Decision_Node(att, true_branch, false_branch)
 
+def print_tree(node, sbl = ""):
+    """Prints the tree.
+    """
+    if isinstance(node, Leaf):
+        print (sbl + ":", node.prediction)
+        return
+    print (sbl + attribute_names[node.attribute] + " = 0 :")
+    print_tree(node.false_branch, sbl + "| ")
+    print (sbl + attribute_names[node.attribute] + " = 1 :")
+    print_tree(node.true_branch, sbl + "| ")
+
+my_tree = build_tree(training_data)
+print_tree(my_tree)
