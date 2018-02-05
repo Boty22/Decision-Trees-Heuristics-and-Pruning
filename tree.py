@@ -136,7 +136,10 @@ class Leaf(object):
     """
     """
     def __init__(self,rows):
-        self.prediction = class_counts(rows)
+        self.stats = class_counts(rows)
+        self.p = self.stats['positives']
+        self.n = self.stats['negatives']
+        self.prediction = 1 if (self.p > self.n ) else 0
         
 class Decision_Node:
     """
@@ -146,7 +149,7 @@ class Decision_Node:
         self.true_branch = true_branch
         self.false_branch = false_branch
         
-def build_tree(rows):
+def build_tree_gain(rows):
     """
     """
     g, att = find_best_att(rows)
@@ -154,12 +157,27 @@ def build_tree(rows):
         return Leaf(rows)
     true_rows, false_rows = partition(rows,att)
     
-    true_branch = build_tree(true_rows)
-    false_branch= build_tree(false_rows)
+    true_branch = build_tree_gain(true_rows)
+    false_branch= build_tree_gain(false_rows)
     
     return Decision_Node(att, true_branch, false_branch)
 
 def print_tree(node, sbl = ""):
+    """Prints the tree.
+    """
+    if isinstance(node.false_branch, Leaf):
+        print (sbl + attribute_names[node.attribute] + " = 0 :", node.false_branch.prediction)
+        return
+    print (sbl + attribute_names[node.attribute] + " = 0 :")
+    print_tree(node.false_branch, sbl + "| ")
+
+    if isinstance(node.true_branch, Leaf):
+        print (sbl + attribute_names[node.attribute] + " = 1 :", node.true_branch.prediction)
+        return
+    print (sbl + attribute_names[node.attribute] + " = 1 :")
+    print_tree(node.true_branch, sbl + "| ")
+
+def print_tree2(node, sbl = ""):
     """Prints the tree.
     """
     if isinstance(node, Leaf):
@@ -170,5 +188,6 @@ def print_tree(node, sbl = ""):
     print (sbl + attribute_names[node.attribute] + " = 1 :")
     print_tree(node.true_branch, sbl + "| ")
 
-my_tree = build_tree(training_data)
-print_tree(my_tree)
+
+my_tree_gain = build_tree_gain(training_data)
+print_tree(my_tree_gain)
