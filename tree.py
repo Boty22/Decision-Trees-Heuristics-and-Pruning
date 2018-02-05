@@ -99,7 +99,7 @@ def entropy(rows):
 
 #print(entropy(training_data))
 
-def gain(left,right,current_entropy):
+def gain_e(left,right,current_entropy):
     """Information Gain.
     The entropy of the starting node, 
     minus the weight entropy of two child nodes
@@ -109,10 +109,29 @@ def gain(left,right,current_entropy):
 
 #print(gain(strong, weak,entropy(training_data)))
 
+def varimp(rows):
+    counts = class_counts(rows)
+    p = float(counts['positives'])
+    n = float(counts['negatives'])
+    #print(p,n)
+    if p == 0 or n == 0:
+        return 0;
+    else:
+        return p*n/(p+n)**2
+    
+def gain_v(left,right,current_varimp):
+    """Information Gain.
+    The entropy of the starting node, 
+    minus the weight entropy of two child nodes
+    """
+    p = float(len(left))/(len(left)+len(right))
+    return current_varimp - p *varimp(left) - (1-p) * varimp(right)
+
+
 high,normal = partition(training_data,0)
 #print(gain(high, normal,entropy(training_data)))
 
-def find_best_att(rows):
+def find_best_att_entropy(rows):
     """Look for the best attriute
     """
     best_gain = 0
@@ -123,14 +142,34 @@ def find_best_att(rows):
         true_rows, false_rows = partition(rows, att)
         if len(true_rows) == 0 or len(false_rows)==0:
             continue #The gain will be 0 anyway
-        g = gain(true_rows,false_rows,current_entropy)
+        g = gain_e(true_rows,false_rows,current_entropy)
         if g >= best_gain:
             best_gain = g
             best_attribute = att
     return best_gain, best_attribute
 
-g,att = find_best_att(training_data)
+g,att = find_best_att_entropy(training_data)
 #print(g,attribute_names[att])
+
+def find_best_att_varimp(rows):
+    """Look for the best attriute
+    """
+    best_gain = 0
+    best_attribute = -1000
+    current_varimp = varimp(rows)
+    n_features = len(rows[0])-1
+    for att in range(n_features):
+        true_rows, false_rows = partition(rows, att)
+        if len(true_rows) == 0 or len(false_rows)==0:
+            continue # This avoid division by 0
+        g = gain_v(true_rows,false_rows,current_varimp)
+        if g >= best_gain:
+            best_gain = g
+            best_attribute = att
+    return best_gain, best_attribute
+
+
+
 
 class Leaf(object):
     """
@@ -149,18 +188,34 @@ class Decision_Node:
         self.true_branch = true_branch
         self.false_branch = false_branch
         
-def build_tree_gain(rows):
+def build_tree_entropy(rows):
     """
     """
-    g, att = find_best_att(rows)
+    g, att = find_best_att_entropy(rows)
     if g == 0:
         return Leaf(rows)
     true_rows, false_rows = partition(rows,att)
     
-    true_branch = build_tree_gain(true_rows)
-    false_branch= build_tree_gain(false_rows)
+    true_branch = build_tree_entropy(true_rows)
+    false_branch= build_tree_entropy(false_rows)
     
     return Decision_Node(att, true_branch, false_branch)
+
+def build_tree_varimp(rows):
+    """
+    """
+    g, att = find_best_att_varimp(rows)
+    if g == 0:
+        return Leaf(rows)
+    true_rows, false_rows = partition(rows,att)
+    
+    true_branch = build_tree_varimp(true_rows)
+    false_branch= build_tree_varimp(false_rows)
+    
+    return Decision_Node(att, true_branch, false_branch)
+
+
+
 
 def print_tree(node, sbl = ""):
     """Prints the tree.
@@ -189,5 +244,8 @@ def print_tree2(node, sbl = ""):
     print_tree(node.true_branch, sbl + "| ")
 
 
-my_tree_gain = build_tree_gain(training_data)
-print_tree(my_tree_gain)
+my_tree_entropy = build_tree_entropy(training_data)
+print_tree(my_tree_entropy)
+
+my_tree_varimp = build_tree_varimp(training_data)
+print_tree(my_tree_varimp)
