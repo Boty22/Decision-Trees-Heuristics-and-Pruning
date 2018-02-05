@@ -263,15 +263,24 @@ def accuracy(testing_data, node):
     for row in testing_data:
         if classify(row, node) == row[-1]:
             matches += 1
-    print(len(testing_data))
+    #print(len(testing_data))
     return float(matches)/len(testing_data)
+
+def count_non_leaf(node):
+    if isinstance(node, Leaf):
+        return 0
+    else:
+        return 1 + count_non_leaf(node.true_branch) + count_non_leaf(node.false_branch)
 
 my_tree_entropy = build_tree_entropy(training_data)
 #print_tree(my_tree_entropy)
-print("\n the accuracy with entropy is:")
+print("\nThe accuracy with entropy is:")
 print(accuracy(testing_data, my_tree_entropy))
-
+print("Number of non leaf nodes: ", count_non_leaf(my_tree_entropy))
 my_tree_varimp = build_tree_varimp(training_data)
 #print_tree(my_tree_varimp)
-print("\n the accuracy with variance impurity is:")
+print("\nThe accuracy with variance impurity is:")
 print(accuracy(testing_data, my_tree_varimp))
+print("Number of non leaf nodes: ", count_non_leaf(my_tree_varimp))
+
+
