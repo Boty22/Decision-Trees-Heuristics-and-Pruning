@@ -141,5 +141,21 @@ class Leaf(object):
 class Decision_Node:
     """
     """
-    def __init__(self,rows):
+    def __init__(self,attribute,true_branch,false_branch):
+        self.attribute = attribute
+        self.true_branch = true_branch
+        self.false_branch = false_branch
         
+def build_tree(rows):
+    """
+    """
+    g, att = find_best_att(rows)
+    if g == 0:
+        return Leaf(rows)
+    true_rows, false_rows = partition(rows,att)
+    
+    true_branch = build_tree(true_rows)
+    false_branch= build_tree(false_rows)
+    
+    return Decision_Node(att, true_branch, false_branch)
+
