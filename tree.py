@@ -12,7 +12,7 @@ import numpy as np
 def copyData(filename):
     """Reads the data and retund a list with the data in the cvs"""
     data=[]
-    filename = "training_set.csv"
+    #filename = "training_set.csv"
     try:
         fh = open(filename,'r')
     except IOError:
@@ -28,8 +28,10 @@ def copyData(filename):
     return data
 
 #Copying the file to a list 
-training_file = "probando.csv"
+training_file = "training_set.csv"
+testing_file = "test_set.csv"
 a = copyData(training_file)
+b = copyData(testing_file)
 #print(a)
 #keep the attribute names and the data in different structures
 #this is the header of the data
@@ -46,6 +48,7 @@ def convert_list_s_int(l_s):
 #print(a[1:])
         
 training_data= convert_list_s_int(a[1:])
+testing_data= convert_list_s_int(b[1:])
 #print(training_data)
 
 def class_counts(rows):
@@ -243,9 +246,32 @@ def print_tree2(node, sbl = ""):
     print (sbl + attribute_names[node.attribute] + " = 1 :")
     print_tree(node.true_branch, sbl + "| ")
 
+def classify(row, node):
+    if isinstance(node, Leaf):
+        return node.prediction
+    if row[node.attribute] == 1:
+        return classify(row, node.true_branch)
+    else:
+        return classify(row, node.false_branch)
+        
+def accuracy(testing_data, node):
+    """Gets the accuracy of the model
+    testing data: set with the same number of columns that the training data
+    node: decision tree built beforehand  
+    """
+    matches = 0 
+    for row in testing_data:
+        if classify(row, node) == row[-1]:
+            matches += 1
+    print(len(testing_data))
+    return float(matches)/len(testing_data)
 
 my_tree_entropy = build_tree_entropy(training_data)
-print_tree(my_tree_entropy)
+#print_tree(my_tree_entropy)
+print("\n the accuracy with entropy is:")
+print(accuracy(testing_data, my_tree_entropy))
 
 my_tree_varimp = build_tree_varimp(training_data)
-print_tree(my_tree_varimp)
+#print_tree(my_tree_varimp)
+print("\n the accuracy with variance impurity is:")
+print(accuracy(testing_data, my_tree_varimp))
