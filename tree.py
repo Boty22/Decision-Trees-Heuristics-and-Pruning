@@ -107,7 +107,39 @@ def gain(left,right,current_entropy):
     p = float(len(left))/(len(left)+len(right))
     return current_entropy - p *entropy(left) - (1-p) * entropy(right)
 
-print(gain(strong, weak,entropy(training_data)))
+#print(gain(strong, weak,entropy(training_data)))
 
 high,normal = partition(training_data,0)
-print(gain(high, normal,entropy(training_data)))
+#print(gain(high, normal,entropy(training_data)))
+
+def find_best_att(rows):
+    """Look for the best attriute
+    """
+    best_gain = 0
+    best_attribute = -1000
+    current_entropy = entropy(rows)
+    n_features = len(rows[0])-1
+    for att in range(n_features):
+        true_rows, false_rows = partition(rows, att)
+        if len(true_rows) == 0 or len(false_rows)==0:
+            continue #The gain will be 0 anyway
+        g = gain(true_rows,false_rows,current_entropy)
+        if g >= best_gain:
+            best_gain = g
+            best_attribute = att
+    return best_gain, best_attribute
+
+g,att = find_best_att(training_data)
+#print(g,attribute_names[att])
+
+class Leaf(object):
+    """
+    """
+    def __init__(self,rows):
+        self.prediction = class_counts(rows)
+        
+class Decision_Node:
+    """
+    """
+    def __init__(self,rows):
+        
