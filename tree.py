@@ -51,6 +51,11 @@ training_data= convert_list_s_int(a[1:])
 testing_data= convert_list_s_int(b[1:])
 #print(training_data)
 
+current_node_id = 0
+x=0
+
+"""----------------------------------------------------------------"""
+
 def class_counts(rows):
     """ Counts how many positives and negatives a class has
     """
@@ -78,7 +83,7 @@ def partition(rows, attribute):
     return true_rows,false_rows
 
 #print(partition(training_data,1))
-strong, weak = partition(training_data,1)
+#strong, weak = partition(training_data,1)
 #print("Strong")
 #print(strong)
 #print("Weak")
@@ -131,7 +136,7 @@ def gain_v(left,right,current_varimp):
     return current_varimp - p *varimp(left) - (1-p) * varimp(right)
 
 
-high,normal = partition(training_data,0)
+#high,normal = partition(training_data,0)
 #print(gain(high, normal,entropy(training_data)))
 
 def find_best_att_entropy(rows):
@@ -151,7 +156,7 @@ def find_best_att_entropy(rows):
             best_attribute = att
     return best_gain, best_attribute
 
-g,att = find_best_att_entropy(training_data)
+#g,att = find_best_att_entropy(training_data)
 #print(g,attribute_names[att])
 
 def find_best_att_varimp(rows):
@@ -182,18 +187,33 @@ class Leaf(object):
         self.p = self.stats['positives']
         self.n = self.stats['negatives']
         self.prediction = 1 if (self.p > self.n ) else 0
-        
+
 class Decision_Node:
     """
     """
-    def __init__(self,attribute,true_branch,false_branch):
+    def __init__(self,attribute, true_branch, false_branch):
         self.attribute = attribute
         self.true_branch = true_branch
         self.false_branch = false_branch
+        global current_node_id
+        current_node_id += 1
+        self.node_id = current_node_id
+
+def join_lists(a,b):
+    """Takes 2 lists of the same number of columns and returns concatenations of them
+    """
+    result = []
+    for row in a:
+        result.append(row)
+    for row in b:
+        result.append(row)
+    return result
         
 def build_tree_entropy(rows):
     """
     """
+    #global current_node_id
+    #current_node_id += 1
     g, att = find_best_att_entropy(rows)
     if g == 0:
         return Leaf(rows)
@@ -207,6 +227,9 @@ def build_tree_entropy(rows):
 def build_tree_varimp(rows):
     """
     """
+    #global current_node_id
+    #current_node_id += 1
+
     g, att = find_best_att_varimp(rows)
     if g == 0:
         return Leaf(rows)
@@ -216,9 +239,6 @@ def build_tree_varimp(rows):
     false_branch= build_tree_varimp(false_rows)
     
     return Decision_Node(att, true_branch, false_branch)
-
-
-
 
 def print_tree(node, sbl = ""):
     """Prints the tree.
@@ -234,6 +254,22 @@ def print_tree(node, sbl = ""):
         return
     print (sbl + attribute_names[node.attribute] + " = 1 :")
     print_tree(node.true_branch, sbl + "| ")
+
+
+def print_tree_node_id(node, sbl = ""):
+    """Prints the tree.
+    """
+    if isinstance(node.false_branch, Leaf):
+        print (sbl + attribute_names[node.attribute] + " = 0 :", node.false_branch.prediction)
+        return
+    print (sbl + attribute_names[node.attribute] + ' ('+str(node.node_id) + ')'+ " = 0 :")
+    print_tree_node_id(node.false_branch, sbl + "| ")
+
+    if isinstance(node.true_branch, Leaf):
+        print (sbl + attribute_names[node.attribute] + " = 1 :", node.true_branch.prediction)
+        return
+    print (sbl + attribute_names[node.attribute] + ' ('+str(node.node_id) + ')'+ " = 1 :")
+    print_tree_node_id(node.true_branch, sbl + "| ")
 
 def print_tree2(node, sbl = ""):
     """Prints the tree.
@@ -272,15 +308,43 @@ def count_non_leaf(node):
     else:
         return 1 + count_non_leaf(node.true_branch) + count_non_leaf(node.false_branch)
 
+def count_all_nodes(node):
+    if isinstance(node, Leaf):
+        return 1
+    else:
+        return 1+count_all_nodes(node.true_branch) + count_all_nodes(node.false_branch)
+
+"""---------------- Pruning fucions-------------------"""
+def restart_and_order(node):
+    global x
+    x=0
+    return order(node)
+
+def order(node):
+    global x
+    if isinstance(node, Leaf):
+        return
+    order (node.true_branch)
+    order (node.false_branch)
+    x += 1
+    node.node_id = x
+    return
+
+"""---------------- Running the fucions-------------------"""
+
+current_node_id = 0
 my_tree_entropy = build_tree_entropy(training_data)
-#print_tree(my_tree_entropy)
+print_tree(my_tree_entropy)
 print("\nThe accuracy with entropy is:")
 print(accuracy(testing_data, my_tree_entropy))
 print("Number of non leaf nodes: ", count_non_leaf(my_tree_entropy))
+print("Number of nodes in total: ", count_all_nodes(my_tree_entropy))
+
+current_node_id = 0
 my_tree_varimp = build_tree_varimp(training_data)
-#print_tree(my_tree_varimp)
+print_tree(my_tree_varimp)
 print("\nThe accuracy with variance impurity is:")
 print(accuracy(testing_data, my_tree_varimp))
 print("Number of non leaf nodes: ", count_non_leaf(my_tree_varimp))
-
+print("Number ofnodes in total: ", count_all_nodes(my_tree_varimp))
 
