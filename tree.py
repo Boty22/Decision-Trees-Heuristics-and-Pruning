@@ -10,8 +10,12 @@ from math import log2
 #import numpy as np
 from random import randint
 
+#Run $ python program.py 4 10 training_set.csv validation_set.csv test_set.csv yes
+
+
+
 """------------------ GETTING DATA FROM COMMAND LINE ------------------------"""
-'''
+
 #print(sys.argv)
 #print("This is the name of the script: ", sys.argv[0])
 #print ("Number of arguments: ", len(sys.argv))
@@ -23,8 +27,10 @@ validation_file = sys.argv[4]
 testing_file = sys.argv[5]
 to_print = sys.argv[6]
 
-print(L,K,training_csv,validation_csv,test_csv,test_csv,print_order)
-'''
+print(to_print)
+
+#print(L,K,training_csv,validation_csv,test_csv,test_csv,print_order)
+
 
 """-------------------GETTING DATA FROM COMMAN LINE-------------------------"""
 
@@ -48,7 +54,7 @@ def copyData(filename):
 
 #Copying the file to a list 
 
-
+'''
 training_file = "training_set.csv"
 testing_file = "test_set.csv"
 validation_file = "validation_set.csv"
@@ -56,7 +62,7 @@ L = 10
 K = 4
 to_print = 'no'
 
-
+'''
 
 a = copyData(training_file)
 b = copyData(testing_file)
