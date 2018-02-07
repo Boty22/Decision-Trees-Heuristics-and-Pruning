@@ -8,8 +8,23 @@ This program works with attributes and a class that cantake the values 0 or 1
 import sys
 from math import log2
 #import numpy as np
-
 from random import randint
+
+"""------------------ GETTING DATA FROM COMMAND LINE ------------------------"""
+'''
+#print(sys.argv)
+#print("This is the name of the script: ", sys.argv[0])
+#print ("Number of arguments: ", len(sys.argv))
+#Testing which values we have in the command line
+L = int(sys.argv[1])
+K = int(sys.argv[2])
+training_file = sys.argv[3]
+validation_file = sys.argv[4]
+testing_file = sys.argv[5]
+to_print = sys.argv[6]
+
+print(L,K,training_csv,validation_csv,test_csv,test_csv,print_order)
+'''
 
 """-------------------GETTING DATA FROM COMMAN LINE-------------------------"""
 
@@ -32,9 +47,16 @@ def copyData(filename):
     return data
 
 #Copying the file to a list 
+
+
 training_file = "training_set.csv"
 testing_file = "test_set.csv"
 validation_file = "validation_set.csv"
+L = 10
+K = 4
+to_print = 'no'
+
+
 
 a = copyData(training_file)
 b = copyData(testing_file)
@@ -57,6 +79,10 @@ def convert_list_s_int(l_s):
 training_data= convert_list_s_int(a[1:])
 testing_data= convert_list_s_int(b[1:])
 validation_data = convert_list_s_int(c[1:])
+
+
+
+
 #print(training_data)
 
 
@@ -64,7 +90,7 @@ validation_data = convert_list_s_int(c[1:])
 current_node_id = 0
 x=0
 
-"""----------------------------------------------------------------"""
+"""-------------------------- BUILDING THE TREE ----------------------------"""
 
 def class_counts(rows):
     """ Counts how many positives and negatives a class has
@@ -185,8 +211,6 @@ def find_best_att_varimp(rows):
             best_gain = g
             best_attribute = att
     return best_gain, best_attribute
-
-
 
 
 class Leaf_stats(object):
@@ -499,32 +523,97 @@ def post_pruning_entropy(node,L,K):
 # Remember this is a prunned tree so workdd with accuracy_pruned            
 
 
+def post_pruning_varimp(node,L,K):
+    D = build_tree_varimp(training_data)
+    Dbest = D
+    for i in range(L):
+        #build a copy of the original tree to prune
+        Dprime = build_tree_varimp(training_data)
+        M = randint(1,K)
+        for j in range(M):
+            restart_and_order_pruned(Dprime)
+            node_list = []
+            prune_helper(Dprime,node_list)
+            N = len(node_list)
+            if N <= 1 :
+                break
+            P = randint(1,N)
+            node_list[P-1].prune_myself()
+        accuracy_Dprime = accuracy_pruned(validation_data,Dprime)
+        accuracy_Dbest = accuracy_pruned(validation_data,Dbest)
+        if (accuracy_Dprime > accuracy_Dbest):
+            Dbest = Dprime
+    return Dbest
 
 
 
-    
+  
 
-"""---------------- Running the fucions-------------------"""
+"""------------------------ RUNNING FUNCTIONS ----------------------------"""
 
+
+
+print("    *-------------- With entropy --------------*")
 current_node_id = 0
 my_tree_entropy = build_tree_entropy(training_data)
-print_tree_node_id(my_tree_entropy)
-print("\nThe accuracy with entropy is:")
-print(accuracy(training_data, my_tree_entropy))
-print("Number of non leaf nodes: ", count_non_leaf(my_tree_entropy))
-print("Number of nodes in total: ", count_all_nodes(my_tree_entropy))
 
-#current_node_id = 0
-#my_tree_varimp = build_tree_varimp(training_data)
+if(to_print == 'yes'):
+    print_tree(my_tree_entropy)
+
+
+print("\nThe accuracy with entropy on testing data is:")
+print(accuracy(testing_data, my_tree_entropy))
+print("\nThe accuracy with entropy on validation data is:")
+print(accuracy(validation_data,my_tree_entropy))
+#print("Number of non leaf nodes: ", count_non_leaf(my_tree_entropy))
+#print("Number of nodes in total: ", count_all_nodes(my_tree_entropy))
+print("\nThe post_pruning accuracy with entropy on testing data is:")
+
+
+pruned_tree_e = post_pruning_entropy(my_tree_entropy,10,15)
+print(accuracy_pruned(testing_data,pruned_tree_e))
+print("\nThe post_pruning accuracy with entropy on validation data is:")
+print(accuracy_pruned(validation_data,pruned_tree_e))
+
+print("   *------------With variance------------*")
+
+current_node_id = 0
+my_tree_varimp = build_tree_varimp(training_data)
+
+if(to_print == 'yes'):
+    print_tree(my_tree_entropy)
+
 #current_node_id = 0
 #my_tree_varimp2 = build_tree_varimp(training_data)
 #print_tree(my_tree_varimp)
-#print("\nThe accuracy with variance impurity is:")
-#print(accuracy(training_data, my_tree_varimp))
+print("\nThe accuracy with variance impurity on testing data is:")
+print(accuracy(testing_data, my_tree_varimp))
+
+print("\nThe accuracy with variance impurity on validation data is:")
+print(accuracy(validation_data, my_tree_varimp))
+
+pruned_tree_v = post_pruning_varimp(my_tree_entropy,10,15)
+print("\nThe post_pruning accuracy with variance on testing data is:")
+print(accuracy_pruned(testing_data,pruned_tree_v))
+print("\nThe post_pruning accuracy with variance on validation data is:")
+print(accuracy_pruned(validation_data,pruned_tree_v))
+
+
+
+
+
+
+
+
+
+
+
 #print("Number of non leaf nodes: ", count_non_leaf(my_tree_varimp))
 #print("Number ofnodes in total: ", count_all_nodes(my_tree_varimp))
 #print("Number of non leaf nodes: ", count_non_leaf(my_tree_varimp2))
 #print("Number ofnodes in total: ", count_all_nodes(my_tree_varimp2))
+
+
 
 #lista1 = []
 #prune_helper(my_tree_entropy, lista1)
@@ -537,11 +626,11 @@ print("Number of nodes in total: ", count_all_nodes(my_tree_entropy))
 
 #restart_and_order_pruned(my_tree_entropy)
 #print(accuracy_pruned(validation_data,my_tree_entropy))
-print(accuracy(testing_data,my_tree_entropy))
-print(accuracy(validation_data,my_tree_entropy))
+#print(accuracy(testing_data,my_tree_entropy))
+#print(accuracy(validation_data,my_tree_entropy))
 #lista2 = []
 #prune_helper(my_tree_entropy, lista2)
 
-pruned_tree = post_pruning_entropy(my_tree_entropy,10,15)
-print(accuracy_pruned(testing_data,pruned_tree))
-print(accuracy_pruned(validation_data,pruned_tree))
+#pruned_tree = post_pruning_entropy(my_tree_entropy,10,15)
+#print(accuracy_pruned(testing_data,pruned_tree))
+#print(accuracy_pruned(validation_data,pruned_tree))
