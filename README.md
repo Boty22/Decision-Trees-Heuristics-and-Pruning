@@ -12,9 +12,12 @@ Where:
 * pn :(# negative samples)/(# total of samples)
 * pp :(# positive samples)/(# total of samples)
 The 
-
+![eq_info_gain](/images/infogain_eq.png)
 ### 1.2 Variance Impurity Heuristic
-
+lalall
+![eq_VI](/images/vi_eq.png) 
+lalala
+![eq_VI_heuristic](/images/vi_gain_eq.png)
 ## Regularization with Prunnig
 Prunning is a method to regularize a deciion tree, therefore avoid overfitting. As a result the model will generalize better
 
