@@ -49,7 +49,7 @@ The implementation is recursive because of the nature of the problem.
 ## 4. How to run the program
 Clone the repository
 ```sh
-$ python program.py 4 10 training_set.csv validation_set.csv test_set.csv yes
+$ python tree.py 4 10 training_set.csv validation_set.csv test_set.csv yes
 ```
 
 ## Acknowlegments:
