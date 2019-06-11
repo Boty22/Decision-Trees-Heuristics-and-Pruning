@@ -46,7 +46,7 @@ The algorith will try to improve the accuracy of the tree "L" times, prunning M 
 
 ## 3. Printing a Decision tree
 The implementation is recursive because of the nature of the problem. 
-# 4. How to run the program
+## 4. How to run the program
 Clone the repository
 ```sh
 $ python program.py 4 10 training_set.csv validation_set.csv test_set.csv yes
