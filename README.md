@@ -44,10 +44,13 @@ Pr(x) : fraction of the training examples that have X = x
 Prunning is a method to regularize (reduce overfitting) a deciion tree. As a result the model will generalize better.
 The algorith will try to improve the accuracy of the tree "L" times, prunning M nodes. Where M is a random between 1 and K. We have to provide the L and K values to the algorithm 
 
-## Printing a Decision tree
-
-# Key points
-* The implementation is recursive because of the nature of the problem. 
+## 3. Printing a Decision tree
+The implementation is recursive because of the nature of the problem. 
+# 4. How to run the program
+Clone the repository
+```sh
+$ python program.py 4 10 training_set.csv validation_set.csv test_set.csv yes
+```
 
 ## Acknowlegments:
 * Tom Mitchell (Chapter 3)
