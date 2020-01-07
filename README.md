@@ -1,5 +1,48 @@
     
-# Decision Trees Heuristics and Prunning
+# Decision Trees Heuristics and Pruning
+We can define a decision tree as a computational tree where each node contains a question about an attribute, each branch of the node contains an answer to this question. Which question/attribute should be placed in each node is determined by the decision tree learning algorithm.
+As stated in Mitchel, most algorithms that have been developed for learning decision trees are variations on a core algorithm that employs a top-down, greedy search through the space of possible decision trees.
+
+## When are decision trees suitable?
+- For supervised learning: The algorithm needs labeled data is available
+- For classification: The target has discrete values
+- When we have noisy data: The training data might contain errors
+
+## Algorithm:
+```
+ID3 (Examples, Target_Attribute, Attributes)
+    Create a root node for the tree
+    If all examples are positive, Return the single-node tree Root, with label = +.
+    If all examples are negative, Return the single-node tree Root, with label = -.
+    If number of predicting attributes is empty, then Return the single node tree Root, with label = most common value of the target attribute in the examples.
+    Otherwise Begin
+        A ← The Attribute that "best" classifies examples.
+        Decision Tree attribute for Root = A.
+        For each possible value, vi, of A,
+            Add a new tree branch below Root, corresponding to the test A = vi.
+            Let Examples(vi) be the subset of examples that have the value vi for A
+            If Examples(vi) is empty
+                Then below this new branch add a leaf node with label = most common target value in the examples
+            Else below this new branch add the subtree ID3 (Examples(vi), Target_Attribute, Attributes – {A})
+    End
+    Return Root
+```
+
+## Our Data
+
+- Possible values of the target: 0, 1
+- Possible values of attributes: 0, 1
+- Number of attributes: (number of columns in the .csv file) - 1
+- Target location: last column in the .csv file
+- We assume that we have a dataset splited in :
+	- training data
+	- validation data
+	- testig data
+
+## Our Tree
+Naturally the learning algorithm for the decision tree will be implmented using recursion
+
+
 ## 1. Heuristics in a Decision Tree
 How do we decide which attribute should be tested at each node in the tree? Heuritics are quantitative measurements on how useful would be an attribute to split data acccorfing to it (classification).
 
@@ -9,7 +52,7 @@ Here we analize the two heuristics: information gain and variance impurity.
 Lets define Entropy of the set of samples S as a measurement of the homogeneity of the samples in binary data.
 
 Entropy(S) = -pp * log<sub>2</sub>(pp) - pn * log<sub>2</sub>(pn)
-is the
+
 Where:
 * pn :(# negative samples)/(# total of samples)
 * pp :(# positive samples)/(# total of samples)
@@ -55,3 +98,4 @@ $ python tree.py 4 10 training_set.csv validation_set.csv test_set.csv yes
 ## Acknowlegments:
 * Tom Mitchell (Chapter 3)
 * Vibhav Gogate's [Advanced Machine Learning Course](https://www.hlt.utdallas.edu/~vgogate/ml/2018s/resources.html)
+* https://github.com/random-forests/tutorials/blob/master/decision_tree.ipynb
